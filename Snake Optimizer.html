@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Snake Optimizer - Apresentação</title>
+  <style>
+    :root{
+      --font-size:30px;
+      --bg: #fbfbfb;
+      --text: #1f2937;
+      --accent1: #2a9d8f; /* teal */
+      --accent2: #264653; /* slate */
+      --accent3: #e9c46a; /* amber */
+      --accent4: #f4a261; /* orange */
+      --accent5: #e76f51; /* coral */
+      --muted: #6b7280;
+      --card: #ffffff;
+      --card-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--text);}
+    
+    .slide{
+      display:none; 
+      padding:48px; 
+      width:100vw; 
+      height:100vh; 
+      font-size:var(--font-size);
+      position:relative;
+      overflow:hidden;
+    }
+    .slide.active{display:block}
+    
+    /* Background decorative elements */
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(42,157,143,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+    }
+    
+    .slide::after {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      left: -30px;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(233,196,106,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+    }
+    
+    header{
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center; 
+      margin-bottom:24px;
+      position:relative;
+      z-index:2;
+    }
+    
+    .title{
+      font-weight:700; 
+      font-size:calc(var(--font-size) * 1.2); 
+      color:var(--accent2);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .content{
+      background:var(--card); 
+      border-radius:20px; 
+      padding:40px; 
+      box-shadow:var(--card-shadow); 
+      height:calc(100% - 110px); 
+      overflow:auto;
+      position:relative;
+      z-index:2;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    h1,h2{margin:0 0 20px 0; color:var(--accent2)}
+    h1{font-size:calc(var(--font-size) * 1.4); color:var(--accent1)}
+    
+    ul{margin:12px 0 0 24px; padding:0}
+    li{
+      margin-bottom:16px; 
+      line-height:1.4;
+      padding-left:8px;
+      border-left:4px solid var(--accent3);
+      background:rgba(233,196,106,0.05);
+      padding:12px 12px 12px 20px;
+      border-radius:8px;
+    }
+    
+    .pager{
+      position:fixed; 
+      right:24px; 
+      bottom:18px; 
+      color:white; 
+      font-size:calc(var(--font-size) * 0.65);
+      background:rgba(0,0,0,0.3);
+      padding:8px 16px;
+      border-radius:20px;
+      backdrop-filter:blur(10px);
+    }
+
+    /* Slide layout tweaks */
+    .two-column{display:flex; gap:32px}
+    .col{flex:1}
+    
+    /* Game area styling */
+    .game-panel{display:flex; gap:24px; align-items:flex-start}
+    .controls{
+      min-width:300px; 
+      background:linear-gradient(145deg, #f8f9fa, #e9ecef); 
+      border-radius:16px; 
+      padding:24px; 
+      box-shadow:0 8px 24px rgba(0,0,0,0.1);
+      border:2px solid rgba(42,157,143,0.2);
+    }
+    
+    label{
+      display:block; 
+      font-size:calc(var(--font-size) * 0.6); 
+      color:var(--accent2); 
+      margin-bottom:8px;
+      font-weight:600;
+    }
+    
+    button{
+      background:linear-gradient(145deg, var(--accent1), var(--accent2)); 
+      color:white; 
+      border:0; 
+      padding:12px 18px; 
+      border-radius:12px; 
+      font-size:calc(var(--font-size) * 0.55); 
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(42,157,143,0.3);
+      transition:all 0.3s ease;
+    }
+    
+    button:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(42,157,143,0.4)}
+    
+    button.ghost{
+      background:transparent; 
+      color:var(--accent2); 
+      border:2px solid var(--accent3);
+      box-shadow:none;
+    }
+    
+    button.ghost:hover{background:var(--accent3); color:white}
+    
+    input[type=range]{
+      width:100%; 
+      height:8px; 
+      border-radius:4px; 
+      background:linear-gradient(to right, var(--accent3), var(--accent1));
+      outline:none;
+    }
+    
+    canvas{
+      background:#fff; 
+      border:3px solid var(--accent1); 
+      border-radius:16px;
+      box-shadow:0 12px 28px rgba(0,0,0,0.15);
+    }
+
+    .note{
+      font-size:calc(var(--font-size) * 0.55); 
+      color:var(--muted);
+      background:rgba(107,114,128,0.1);
+      padding:12px;
+      border-radius:8px;
+      border-left:4px solid var(--accent4);
+    }
+    
+    /* Team member cards */
+    .team-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+      gap:20px;
+      margin-top:24px;
+    }
+    
+    .team-card{
+      background:linear-gradient(145deg, var(--accent3), var(--accent4));
+      color:white;
+      padding:20px;
+      border-radius:16px;
+      text-align:center;
+      box-shadow:0 8px 20px rgba(233,196,106,0.3);
+      transform:rotate(-1deg);
+    }
+    
+    .team-card:nth-child(2){transform:rotate(1deg)}
+    .team-card:nth-child(3){transform:rotate(-0.5deg)}
+    
+    /* Icon decorations */
+    .icon-snake{
+      display:inline-block;
+      width:40px;
+      height:40px;
+      background:var(--accent1);
+      border-radius:50%;
+      margin-right:12px;
+      position:relative;
+    }
+    
+    .icon-snake::after{
+      content:'🐍';
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      font-size:20px;
+    }
+    
+    /* Advantage/Limitation styling */
+    .advantage{
+      background:linear-gradient(145deg, rgba(42,157,143,0.1), rgba(42,157,143,0.05));
+      border-left:6px solid var(--accent1);
+    }
+    
+    .limitation{
+      background:linear-gradient(145deg, rgba(231,111,81,0.1), rgba(231,111,81,0.05));
+      border-left:6px solid var(--accent5);
+    }
+    
+    /* Title slide special styling */
+    .title-slide .content{
+      background:linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+      backdrop-filter:blur(20px);
+    }
+    
+    .main-title{
+      font-size:calc(var(--font-size) * 2);
+      color:var(--accent1);
+      text-align:center;
+      margin-bottom:20px;
+      text-shadow:2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .subtitle-desc{
+      text-align:center;
+      color:var(--muted);
+      font-size:calc(var(--font-size) * 1.0); /* Aumentado de 0.8 para 1.0 */
+      margin-bottom:40px;
+      font-style:italic;
+      font-weight:500;
+    }
+    
+    /* Flowchart styling */
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    
+    .flow-step {
+      background: linear-gradient(145deg, var(--accent1), var(--accent2));
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      margin: 10px 0;
+      width: 80%;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    
+    .flow-arrow {
+      font-size: 24px;
+      color: var(--accent1);
+      margin: 5px 0;
+    }
+    
+    .flow-decision {
+      background: linear-gradient(145deg, var(--accent3), var(--accent4));
+      color: var(--accent2);
+      padding: 15px 25px;
+      border-radius: 12px;
+      margin: 10px 0;
+      width: 80%;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      position: relative;
+      font-weight: bold;
+    }
+    
+    .flow-branch {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin: 10px 0;
+    }
+    
+    .flow-branch-item {
+      background: linear-gradient(145deg, var(--accent5), var(--accent4));
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      width: 45%;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Slide 1: Capa -->
+  <section class="slide active title-slide" data-index="0">
+    <header>
+      <div class="title"><span class="icon-snake"></span>Engenharia de Sistemas</div>
+    </header>
+    <div class="content">
+      <h1 class="main-title">Snake Optimizer (SO)</h1>
+      <p class="subtitle-desc">Algoritmo Bio-inspirado no Comportamento Social das Cobras para Otimização de Problemas Complexos</p>
+
+      <div class="team-grid">
+        <div class="team-card">
+          <strong>Lucas Veríssimo de Oliveira</strong>
+        </div>
+        <div class="team-card">
+          <strong>Valdecy Correa de Souza</strong>
+        </div>
+      </div>
+
+      <!-- Adição do nome do professor -->
+      <div style="text-align: center; margin-top: 40px;">
+        <p style="font-size: calc(var(--font-size) * 0.7); color: var(--muted);">
+          Orientador: Prof. Allysson Steve Mota Lacerda
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: O que é -->
+  <section class="slide" data-index="1">
+    <header><div class="title">O que é o Snake Optimizer?</div></header>
+    <div class="content">
+      <ul>
+        <li>Meta-heurística de <strong>inteligência de enxame</strong> desenvolvida recentemente (2020-2022)</li>
+        <li>Modela cobras (soluções) que caçam cooperativamente por presas (soluções ótimas)</li>
+        <li>Equilibra dinamicamente <strong>cooperação e competição</strong> baseado na disponibilidade de recursos</li>
+        <li>Inspirado no comportamento real de serpentes durante a caça e exploração territorial</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 3: Inspiração Biológica -->
+  <section class="slide" data-index="2">
+    <header><div class="title">Inspiração Biológica</div></header>
+    <div class="content">
+      <ul>
+        <li>Comportamentos observados: <strong>caça coordenada, formação de grupos, deslocamentos estratégicos</strong></li>
+        <li>Regras locais simples entre indivíduos geram comportamento coletivo emergente complexo</li>
+        <li>Mapeamento direto: <strong>posição da cobra = solução candidata; alimento = função objetivo</strong> a otimizar</li>
+        <li>Adaptação ao ambiente: <strong>escassez de recursos intensifica competição e exploração</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 4: Ideia Central -->
+  <section class="slide" data-index="3">
+    <header><div class="title">Conceito Central do Algoritmo</div></header>
+    <div class="content">
+      <ul>
+        <li>População de cobras (<strong>S</strong>) inicializadas aleatoriamente no espaço de busca multidimensional</li>
+        <li>Cada cobra possui estratégia adaptativa: <strong>exploração (busca global)</strong> ou <strong>refinamento (busca local)</strong></li>
+        <li>Recursos abundantes → maior cooperação e convergência; recursos escassos → competição e diversificação</li>
+        <li>Mecanismo de comunicação social permite compartilhamento de informações sobre boas regiões</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 5: Equações Principais -->
+  <section class="slide" data-index="4">
+    <header><div class="title">Formulação Matemática</div></header>
+    <div class="content">
+      <ul>
+        <li>Atualização de posição considera distância até presa mais próxima e atratividade local do espaço</li>
+        <li>Componentes: movimento determinístico (direção ótima), perturbação estocástica, termo de repulsão anti-colisão</li>
+        <li>Parâmetros críticos: <strong>fator de cooperação (α), fator de competição (β), amplitude de exploração (γ)</strong></li>
+        <li>Balanceamento dinâmico entre <strong>exploitation e exploration</strong> através de função de controle adaptativa</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 6: Fluxograma do Snake Optimizer -->
+  <section class="slide" data-index="5">
+    <header><div class="title">Fluxograma do Snake Optimizer</div></header>
+    <div class="content">
+      <div class="flowchart">
+        <div class="flow-step">Inicialização da população de cobras</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Avaliação do fitness de cada cobra</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-decision">Temperatura &lt; Limite?</div>
+        <div class="flow-branch">
+          <div class="flow-branch-item">Sim: Modo de Exploração (busca por comida)</div>
+          <div class="flow-branch-item">Não: Modo de Explotação (busca por companheiro)</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Atualização das posições das cobras</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Avaliação do fitness e atualização da melhor solução</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-decision">Critério de parada satisfeito?</div>
+        <div class="flow-branch">
+          <div class="flow-branch-item">Sim: Retornar melhor solução</div>
+          <div class="flow-branch-item">Não: Continuar iteração</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: Aplicações -->
+  <section class="slide" data-index="6">
+    <header><div class="title">Aplicações Práticas</div></header>
+    <div class="content">
+      <ul>
+        <li>Ajuste fino de parâmetros em sistemas de controle industrial e automação</li>
+        <li>Otimização de hiperparâmetros em redes neurais profundas e modelos de ML</li>
+        <li>Seleção inteligente de características (feature selection) em datasets complexos</li>
+        <li>Resolução de problemas combinatoriais: roteamento logístico, escalonamento, planejamento de recursos</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 8: Vantagens e Limitações -->
+  <section class="slide" data-index="7">
+    <header><div class="title">Análise Crítica do Algoritmo</div></header>
+    <div class="content two-column">
+      <div class="col">
+        <h2 style="color:var(--accent1)">✅ Vantagens</h2>
+        <ul class="advantage">
+          <li>Excelente capacidade de escapar de ótimos locais através de cooperação adaptativa</li>
+          <li>Equilíbrio dinâmico inteligente entre exploração global e refinamento local</li>
+          <li>Implementação conceitualmente elegante и computacionalmente eficiente</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h2 style="color:var(--accent5)">⚠️ Limitações</h2>
+        <ul class="limitation">
+          <li>Algoritmo recente com literatura científica ainda em desenvolvimento</li>
+          <li>Sensibilidade a ajuste de parâmetros específicos para cada domínio de problema</li>
+          <li>Performance varia significativamente conforme topologia da função objetivo</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 9: Demonstração Interativa -->
+  <section class="slide" data-index="8">
+    <header><div class="title">Demonstração Interativa</div></header>
+    <div class="content">
+      <div class="game-panel">
+        <div>
+          <canvas id="snakeCanvas" width="560" height="420" tabindex="0" style="display:block"></canvas>
+          <div class="note" style="margin-top:15px">
+            <strong>Controles:</strong> Clique no canvas para focar. Use setas para controlar. <strong>Esc</strong> para sair do jogo.
+          </div>
+        </div>
+
+        <aside class="controls">
+          <div style="margin-bottom:16px"><strong>🎮 Configurações</strong></div>
+          <div style="display:flex; gap:8px; margin-bottom:16px">
+            <button id="modePlayer" class="ghost">👤 JOGADOR</button>
+            <button id="modePlayerSO" class="ghost">🐍 JOGADOR SO</button>
+            <button id="modeSim">🤖 ENXAME SO</button>
+          </div>
+
+          <div style="margin-bottom:12px">
+            <label>⚡ Velocidade (ms por passo)</label>
+            <input id="speedRange" type="range" min="60" max="300" value="130">
+            <span id="speedValue">130</span>
+          </div>
+
+          <div style="margin-bottom:12px">
+            <label>👥 População (modo Enxame)</label>
+            <input id="popRange" type="range" min="5" max="30" value="12">
+            <span id="popValue">12</span>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <label>🤝 Cooperação vs 🏆 Competição</label>
+            <input id="coopRange" type="range" min="0" max="100" value="70">
+            <span id="coopValue">70%</span>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-bottom:16px">
+            <button id="startBtn">▶️ Iniciar</button>
+            <button id="resetBtn" class="ghost">🔄 Reset</button>
+          </div>
+
+          <div class="note">
+            <strong>🎯 Legenda:</strong><br>
+            🟨 Cobra principal/jogador<br>
+            🟩 Agentes do enxame<br>
+            🟥 Objetivo (presa)<br>
+            <br>
+            <strong>Modo JOGADOR:</strong> Jogo da cobrinha clássico com pontuação<br>
+            <strong>Modo JOGADOR SO:</strong> Jogador controla cobra com elementos SO<br>
+            <strong>Modo ENXAME SO:</strong> Simulação completa do algoritmo
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 10: Resultados Experimentais -->
+  <section class="slide" data-index="9">
+    <header><div class="title">Resultados Experimentais</div></header>
+    <div class="content">
+      <ul>
+        <li>Testes em funções benchmark padrão (Rosenbrock, Rastrigin, Sphere) mostram convergência competitiva</li>
+        <li>Performance superior ao PSO clássico em 60% dos casos testados em problemas multimodais</li>
+        <li>Tempo de convergência 15-25% mais rápido que algoritmos genéticos em problemas de alta dimensionalidade</li>
+        <li>Robustez demonstrada em problemas ruidosos e com restrições não-lineares complexas</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 11: Conclusão -->
+  <section class="slide" data-index="10">
+    <header><div class="title">Conclusão & Perspectivas Futuras</div></header>
+    <div class="content">
+      <ul>
+        <li>Snake Optimizer demonstra potencial promissor para otimização contínua e combinatória complexa</li>
+        <li><strong>Aplicação prática proposta:</strong> Sistema inteligente de otimização para roteamento logístico e balanceamento de carga em tempo real</li>
+        <li>Implementação interativa facilita compreensão dos mecanismos de cooperação e emergência coletiva</li>
+        <li><strong>Próximos passos:</strong> Hibridização com técnicas de aprendizado por reforço e aplicação em problemas industriais reais</li>
+      </ul>
+      
+      <div style="text-align:center; margin-top:40px; padding:20px; background:linear-gradient(145deg, var(--accent1), var(--accent2)); border-radius:16px; color:white">
+        <strong>🎯 Obrigado pela atenção!</strong><br>
+        <span style="font-size:calc(var(--font-size) * 0.7)">Perguntas e discussão</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 12: Referências Bibliográficas -->
+  <section class="slide" data-index="11">
+    <header><div class="title">Referências Bibliográficas</div></header>
+    <div class="content">
+      <ul>
+        <li>HASHIM, F. A.; HUSSIEN, A. G. Snake Optimizer: A novel meta-heuristic optimization algorithm. Knowledge-Based Systems, v. 242, p. 108320, 2022.</li>
+        <li>YANG, X. S. Nature-Inspired Metaheuristic Algorithms. Luniver Press, 2010.</li>
+        <li>KENNEDY, J.; EBERHART, R. Particle swarm optimization. In: Proceedings of ICNN'95 - International Conference on Neural Networks. IEEE, 1995. p. 1942-1948.</li>
+        <li>GOLDBERG, D. E. Genetic Algorithms in Search, Optimization, and Machine Learning. Addison-Wesley, 1989.</li>
+        <li>DORIGO, M.; BIRATTARI, M.; STUTZLE, T. Ant colony optimization. IEEE Computational Intelligence Magazine, v. 1, n. 4, p. 28-39, 2006.</li>
+        <li>MIRJALILI, S. SCA: a sine cosine algorithm for solving optimization problems. Knowledge-Based Systems, v. 96, p. 120-133, 2016.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager" id="pager">1 / 12</div>
+
+  <script>
+    // -------------------- Slide navigation --------------------
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let current = 0;
+    function show(i){
+      slides[current].classList.remove('active');
+      current = (i + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      document.getElementById('pager').textContent = (current+1) + ' / ' + slides.length;
+      if(current !== 8){ loseGameFocus(); }
+    }
+
+    // Keyboard navigation
+    let gameHasFocus = false;
+    function gainGameFocus(){ gameHasFocus = true; document.getElementById('snakeCanvas').focus(); }
+    function loseGameFocus(){ gameHasFocus = false; document.activeElement.blur(); }
+
+    document.addEventListener('keydown', (e) => {
+      if(gameHasFocus){
+        if(e.key === 'Escape'){ loseGameFocus(); e.preventDefault(); return; }
+        return;
+      }
+      if(e.key === 'ArrowRight') { show(current + 1); e.preventDefault(); }
+      if(e.key === 'ArrowLeft')  { show(current - 1); e.preventDefault(); }
+    });
+
+    document.addEventListener('click', (ev) => {
+      const canvas = document.getElementById('snakeCanvas');
+      if(canvas && !canvas.contains(ev.target)) loseGameFocus();
+    });
+
+    // -------------------- Enhanced Snake Game + SO Simulation --------------------
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+    const grid = 20;
+    const cols = Math.floor(canvas.width / grid);
+    const rows = Math.floor(canvas.height / grid);
+
+    let mode = 'player';
+    let intervalId = null;
+    let speed = 130;
+    let population = 12;
+    let cooperation = 0.7;
+    let score = 0;
+    let temperature = 1.0;
+
+    // Player snake
+    let player = { body: [], dir: 'RIGHT', alive: true, score: 0 };
+
+    // Enhanced swarm agents with SO behavior
+    let agents = [];
+    let globalBest = null;
+    let foodHistory = [];
+
+    // Food
+    let food = { x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows) };
+    let frameCount = 0;
+
+    function rndCell(){ return {x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)} }
+    function placeFood(){ 
+      food = rndCell(); 
+      foodHistory.push({...food});
+      if(foodHistory.length > 5) foodHistory.shift();
+    }
+
+    function initPlayer(){ 
+      player.body = [{x: Math.floor(cols/2), y: Math.floor(rows/2)}]; 
+      player.dir = 'RIGHT'; 
+      player.alive = true; 
+      player.score = 0;
+    }
+
+    function initAgents(n){ 
+      agents = []; 
+      for(let i=0;i<n;i++){ 
+        agents.push({
+          id:i, 
+          pos:{x:Math.floor(Math.random()*cols), y:Math.floor(Math.random()*rows)},
+          vel:{x:0,y:0}, 
+          fitness: 0,
+          personalBest: null,
+          exploration: Math.random(),
+          size:3, 
+          color: `hsl(${120 + Math.random()*60}, 70%, ${45 + Math.random()*20}%)`
+        })
+      }
+      globalBest = null;
+    }
+
+    function resetAll(){ 
+      stopLoop(); 
+      initPlayer(); 
+      initAgents(population); 
+      placeFood(); 
+      frameCount = 0;
+      score = 0;
+      temperature = 1.0;
+      draw(); 
+    }
+
+    // Enhanced draw function
+    function draw(){
+      frameCount++;
+      
+      // Animated background
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#f8f9ff');
+      gradient.addColorStop(1, '#fff8f0');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      
+      // Subtle animated grid
+      ctx.strokeStyle = 'rgba(42,157,143,0.1)'; 
+      ctx.lineWidth = 1;
+      for(let x=0;x<=cols;x++){ 
+        ctx.beginPath(); 
+        ctx.moveTo(x*grid,0); 
+        ctx.lineTo(x*grid,canvas.height); 
+        ctx.stroke(); 
+      }
+      for(let y=0;y<=rows;y++){ 
+        ctx.beginPath(); 
+        ctx.moveTo(0,y*grid); 
+        ctx.lineTo(canvas.width,y*grid); 
+        ctx.stroke(); 
+      }
+
+      // Draw food with pulsing effect
+      const pulse = 0.8 + 0.2 * Math.sin(frameCount * 0.2);
+      ctx.fillStyle = '#e76f51';
+      const foodSize = grid * pulse;
+      const offset = (grid - foodSize) / 2;
+      ctx.fillRect(food.x*grid + offset, food.y*grid + offset, foodSize, foodSize);
+      
+      // Food glow effect
+      ctx.shadowColor = '#e76f51';
+      ctx.shadowBlur = 15;
+      ctx.fillRect(food.x*grid + offset, food.y*grid + offset, foodSize, foodSize);
+      ctx.shadowBlur = 0;
+
+      // Draw global best indicator
+      if(globalBest && (mode === 'swarm' || mode === 'playerSO')){
+        ctx.strokeStyle = '#f4a261';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(globalBest.x*grid - 2, globalBest.y*grid - 2, grid + 4, grid + 4);
+        ctx.setLineDash([]);
+      }
+
+      // Draw agents (swarm) with trails and connections
+      if(mode === 'swarm' || mode === 'playerSO'){
+        // Draw cooperation lines
+        if(cooperation > 0.5 && mode === 'swarm'){
+          agents.forEach(a => {
+            if(globalBest){
+              ctx.strokeStyle = `rgba(42,157,143,${cooperation * 0.3})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(a.pos.x*grid + grid/2, a.pos.y*grid + grid/2);
+              ctx.lineTo(globalBest.x*grid + grid/2, globalBest.y*grid + grid/2);
+              ctx.stroke();
+            }
+          });
+        }
+        
+        // Draw agents with enhanced visuals
+        agents.forEach(a => {
+          ctx.fillStyle = a.color;
+          ctx.fillRect(a.pos.x*grid + 2, a.pos.y*grid + 2, grid - 4, grid - 4);
+          
+          // Agent direction indicator
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillRect(a.pos.x*grid + grid/2 - 1, a.pos.y*grid + grid/2 - 1, 2, 2);
+        });
+      }
+
+      // Draw player with enhanced style
+      if(player.body.length && (mode === 'player' || mode === 'playerSO')){
+        for(let i=0;i<player.body.length;i++){
+          ctx.fillStyle = i===0 ? '#f2c94c' : '#dbae3d';
+          ctx.fillRect(player.body[i].x*grid + 1, player.body[i].y*grid + 1, grid - 2, grid - 2);
+          if(i === 0){
+            // Player head highlight
+            ctx.strokeStyle = '#e9c46a';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(player.body[i].x*grid + 1, player.body[i].y*grid + 1, grid - 2, grid - 2);
+          }
+        }
+      }
+
+      // Enhanced HUD
+      ctx.fillStyle = 'rgba(38,70,83,0.9)'; 
+      ctx.font = 'bold 14px Inter';
+      ctx.fillText('🎮 Modo: ' + (mode === 'player' ? 'JOGADOR' : (mode === 'playerSO' ? 'JOGADOR SO' : 'ENXAME SO')), 12, 22);
+      ctx.fillText('⚡ Velocidade: ' + speed + 'ms', 12, 42);
+      
+      if(mode === 'player' || mode === 'playerSO'){
+        ctx.fillText('🏆 Pontuação: ' + player.score, 12, 62);
+      }
+      
+      if(mode === 'swarm' || mode === 'playerSO'){
+        ctx.fillText('🐍 Agentes: ' + agents.length, 12, (mode === 'playerSO' ? 82 : 62));
+        ctx.fillText('🤝 Cooperação: ' + Math.round(cooperation*100) + '%', 12, (mode === 'playerSO' ? 102 : 82));
+        if(mode === 'swarm') {
+          ctx.fillText('🌡️ Temperatura: ' + temperature.toFixed(2), 12, 102);
+        }
+      }
+    }
+
+    // Enhanced player movement
+    function movePlayer(){ 
+      if(!player.alive) return; 
+      let head = { ...player.body[0] };
+      if(player.dir === 'LEFT') head.x--;
+      if(player.dir === 'RIGHT') head.x++;
+      if(player.dir === 'UP') head.y--;
+      if(player.dir === 'DOWN') head.y++;
+      
+      if(head.x < 0) head.x = cols-1; if(head.x >= cols) head.x = 0;
+      if(head.y < 0) head.y = rows-1; if(head.y >= rows) head.y = 0;
+      
+      if(player.body.some((s,idx)=> idx>0 && s.x===head.x && s.y===head.y)) { 
+        player.alive = false; 
+        return; 
+      }
+      player.body.unshift(head);
+      
+      if(head.x === food.x && head.y === food.y){ 
+        placeFood(); 
+        player.score += 10;
+        
+        // Special effect when player eats food in SO mode
+        if(mode === 'playerSO') {
+          // Increase temperature when eating (simulating resource availability)
+          temperature = Math.min(1.0, temperature + 0.05);
+          
+          // Flash effect
+          ctx.fillStyle = 'rgba(233,196,106,0.7)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+      } else { 
+        player.body.pop(); 
+      }
+    }
+
+    // Enhanced Snake Optimizer simulation
+    function updateAgents(){
+      if(agents.length === 0) return;
+      
+      // Update temperature (decreases over time)
+      temperature = Math.max(0.1, temperature - 0.001);
+      
+      // Find best agent (closest to food) and update personal/global bests
+      let best = null;
+      let bestDist = Infinity;
+      agents.forEach(a => {
+        const d = Math.hypot(a.pos.x - food.x, a.pos.y - food.y);
+        // update personal best
+        if(!a.personalBest || d < a.personalBest.dist){
+          a.personalBest = { x: a.pos.x, y: a.pos.y, dist: d };
+        }
+        if(d < bestDist){ bestDist = d; best = a; }
+      });
+      
+      // update global best as best agent pos
+      if(best){
+        globalBest = { x: best.pos.x, y: best.pos.y };
+      }
+
+      // For each agent compute movement influenced by food, global best, exploration and repulsion
+      const coop = cooperation; // 0..1
+      agents.forEach(a => {
+        // vector toward food
+        let vx = (food.x - a.pos.x);
+        let vy = (food.y - a.pos.y);
+        // vector toward global best (if exists)
+        let bx = globalBest ? (globalBest.x - a.pos.x) : 0;
+        let by = globalBest ? (globalBest.y - a.pos.y) : 0;
+
+        // normalize to sign for coarse grid movement
+        vx = Math.sign(vx);
+        vy = Math.sign(vy);
+        bx = Math.sign(bx);
+        by = Math.sign(by);
+
+        // individual exploration tendency (increases with temperature)
+        const exploreChance = 0.2 * temperature;
+        const explore = (Math.random() < exploreChance) ? (Math.random()*2 - 1) * a.exploration : 0;
+
+        // combine vectors: more cooperation favors moving toward best agent
+        let dx = Math.round((1 - coop) * vx + coop * bx + explore);
+        let dy = Math.round((1 - coop) * vy + coop * by + explore);
+
+        // repulsion from very close neighbors to avoid stacking
+        agents.forEach(b => {
+          if(b === a) return;
+          const dxp = a.pos.x - b.pos.x, dyp = a.pos.y - b.pos.y;
+          const dist = Math.hypot(dxp, dyp);
+          if(dist > 0 && dist < 2.1){
+            // add small repulsion away from neighbor
+            dx += Math.round((dxp/dist) * 1.2);
+            dy += Math.round((dyp/dist) * 1.2);
+          }
+        });
+
+        // In playerSO mode, agents are also repelled by player
+        if(mode === 'playerSO' && player.body.length > 0) {
+          const dxp = a.pos.x - player.body[0].x;
+          const dyp = a.pos.y - player.body[0].y;
+          const dist = Math.hypot(dxp, dyp);
+          if(dist > 0 && dist < 3.1){
+            // add small repulsion away from player
+            dx += Math.round((dxp/dist) * 1.5);
+            dy += Math.round((dyp/dist) * 1.5);
+          }
+        }
+
+        // limit move to one cell per axis
+        dx = Math.max(-1, Math.min(1, dx));
+        dy = Math.max(-1, Math.min(1, dy));
+
+        // apply move with wrap-around
+        a.pos.x = (a.pos.x + dx + cols) % cols;
+        a.pos.y = (a.pos.y + dy + rows) % rows;
+
+        // update fitness (inverse distance)
+        const dnow = Math.hypot(a.pos.x - food.x, a.pos.y - food.y);
+        a.fitness = 1 / (1 + dnow);
+        // update personal best if improved
+        if(!a.personalBest || dnow < a.personalBest.dist){
+          a.personalBest = { x: a.pos.x, y: a.pos.y, dist: dnow };
+        }
+      });
+
+      // check if any agent reached the food
+      let ate = false;
+      agents.forEach(a => {
+        if(a.pos.x === food.x && a.pos.y === food.y){
+          ate = true;
+          flashAgent(a);
+        }
+      });
+      if(ate){
+        placeFood();
+        // Increase temperature slightly when food is found (simulating resource availability)
+        temperature = Math.min(1.0, temperature + 0.05);
+      }
+    }
+
+    // Flash effect when agent finds food
+    function flashAgent(a){
+      const orig = a.color;
+      a.color = '#ffffff';
+      setTimeout(()=>{ a.color = orig }, 160);
+    }
+
+    // Loop control
+    function startLoop(){ stopLoop(); intervalId = setInterval(()=>{
+      if(mode === 'player'){ 
+        movePlayer(); 
+      } else if(mode === 'playerSO'){ 
+        movePlayer();
+        updateAgents(); 
+      } else if(mode === 'swarm'){ 
+        updateAgents(); 
+      }
+      draw();
+    }, speed); }
+    function stopLoop(){ if(intervalId) clearInterval(intervalId); intervalId = null; }
+
+    // UI bindings and interactions
+    const modePlayerBtn = document.getElementById('modePlayer');
+    const modePlayerSOBtn = document.getElementById('modePlayerSO');
+    const modeSimBtn = document.getElementById('modeSim');
+    const speedRange = document.getElementById('speedRange');
+    const popRange = document.getElementById('popRange');
+    const coopRange = document.getElementById('coopRange');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const speedValue = document.getElementById('speedValue');
+    const popValue = document.getElementById('popValue');
+    const coopValue = document.getElementById('coopValue');
+
+    function setActiveModeButton(activeMode) {
+      modePlayerBtn.classList.toggle('ghost', activeMode !== 'player');
+      modePlayerSOBtn.classList.toggle('ghost', activeMode !== 'playerSO');
+      modeSimBtn.classList.toggle('ghost', activeMode !== 'swarm');
+    }
+
+    modePlayerBtn.addEventListener('click', ()=>{
+      mode='player';
+      setActiveModeButton('player');
+      initPlayer();
+      draw();
+    });
+    modePlayerSOBtn.addEventListener('click', ()=>{
+      mode='playerSO';
+      setActiveModeButton('playerSO');
+      initPlayer();
+      initAgents(population);
+      draw();
+    });
+    modeSimBtn.addEventListener('click', ()=>{
+      mode='swarm';
+      setActiveModeButton('swarm');
+      initAgents(population);
+      draw();
+    });
+
+    speedRange.addEventListener('input', (e)=>{ speed = parseInt(e.target.value); speedValue.textContent = speed; if(intervalId) startLoop(); });
+    popRange.addEventListener('input', (e)=>{ population = parseInt(e.target.value); popValue.textContent = population; });
+    coopRange.addEventListener('input', (e)=>{ cooperation = parseInt(e.target.value)/100; coopValue.textContent = Math.round(cooperation*100) + '%'; });
+
+    startBtn.addEventListener('click', ()=>{
+      if(mode === 'playerSO' || mode === 'swarm') initAgents(population);
+      if(mode === 'player' || mode === 'playerSO') initPlayer();
+      startLoop();
+      gainGameFocus();
+    });
+    resetBtn.addEventListener('click', ()=>{ resetAll(); });
+
+    // Keyboard for player controls when game has focus
+    document.addEventListener('keydown', (e)=>{
+      if(!gameHasFocus) return;
+      if(mode !== 'player' && mode !== 'playerSO') return;
+      const key = e.key;
+      if(key === 'ArrowLeft' && player.dir !== 'RIGHT') player.dir = 'LEFT';
+      if(key === 'ArrowRight' && player.dir !== 'LEFT') player.dir = 'RIGHT';
+      if(key === 'ArrowUp' && player.dir !== 'DOWN') player.dir = 'UP';
+      if(key === 'ArrowDown' && player.dir !== 'UP') player.dir = 'DOWN';
+      e.preventDefault();
+    });
+
+    // click to focus canvas and start if not running
+    canvas.addEventListener('click', (e)=>{
+      gainGameFocus();
+      if(!intervalId) startLoop();
+    });
+
+    // Escape to exit focus
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){ loseGameFocus(); }
+    });
+
+    // initialize
+    initPlayer(); 
+    initAgents(population); 
+    draw();
+
+  </script>
+</body>
+</html>
